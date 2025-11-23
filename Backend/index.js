@@ -40,22 +40,37 @@ app.get('/api/status', async (req, res) => {
   }
 });
 
-app.get('/', (req, res) => res.send({ ok: true }));
+app.get('/', (req, res) => res.json({ ok: true, message: 'Product Inventory API' }));
 
-async function start() {
-  // ensure DB is initialized and seeded
-  await seedIfEmpty();
-  const info = dbInfo();
-  console.log(`Backend starting on http://localhost:${PORT}`);
-  console.log(`DB Path: ${info.path}`);
-  console.log(`DB Mode: ${info.dynamic ? 'dynamic/in-memory' : 'file-based/static'}`);
+// Initialize database on first request (for serverless)
+let dbInitialized = false;
+app.use(async (req, res, next) => {
+  if (!dbInitialized) {
+    try {
+      await getDb();
+      console.log('Database initialized');
+      dbInitialized = true;
+    } catch (err) {
+      console.error('DB init error:', err);
+    }
+  }
+  next();
+});
 
-  app.listen(PORT, () => {
-    console.log(`Backend listening on http://localhost:${PORT}`);
+// For local development
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 8000;
+  app.listen(PORT, async () => {
+    try {
+      await seedIfEmpty();
+      const info = dbInfo();
+      console.log(`Backend listening on http://localhost:${PORT}`);
+      console.log(`DB: ${info.path}`);
+    } catch (err) {
+      console.error('Startup error:', err);
+    }
   });
 }
 
-start().catch(err => {
-  console.error(err);
-  process.exit(1);
-});
+// Export for Vercel serverless
+export default app;
