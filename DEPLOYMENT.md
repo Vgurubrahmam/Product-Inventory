@@ -335,10 +335,13 @@ app.use(cors({
 ```
 
 ### Database Not Persisting (Render)
-Render's free tier has ephemeral storage. Upgrade to paid plan or use:
-- Railway (persistent disk)
-- Supabase PostgreSQL (migrate from SQLite)
-- MongoDB Atlas (requires schema changes)
+**Important**: Render's free tier has **ephemeral storage** - your SQLite database will be deleted on every restart!
+
+**Solutions:**
+1. **Railway** (Recommended for free tier) - Has persistent disk
+2. **Render Paid Plan** - Persistent disk included
+3. **Migrate to PostgreSQL** - Use Supabase, Neon, or Render PostgreSQL
+4. **Use External Database** - Mount persistent volume or cloud database
 
 ### Build Failures
 - Ensure all dependencies in `package.json`

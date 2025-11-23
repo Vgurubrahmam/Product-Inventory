@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express from 'express';
 import productsRouter from './routes/products.js';
 import { seedIfEmpty, dbInfo, getDb, isDynamicDb } from './db.js';
